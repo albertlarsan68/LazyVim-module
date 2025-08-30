@@ -55,6 +55,9 @@ in
     ./extras/formatting/prettier.nix
 
     ./extras/lang/astro.nix
+    ./extras/lang/clangd.nix
+    ./extras/lang/cmake.nix
+    ./extras/lang/git.nix
     ./extras/lang/go.nix
     ./extras/lang/json.nix
     ./extras/lang/markdown.nix
