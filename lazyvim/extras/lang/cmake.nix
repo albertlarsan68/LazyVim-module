@@ -21,6 +21,7 @@ in
       extraPackages = with pkgs; [
         cmake-lint
         cmake-format
+        neocmakelsp
       ];
 
       plugins = [
