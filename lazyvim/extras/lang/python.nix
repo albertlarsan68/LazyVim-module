@@ -35,12 +35,11 @@ in
     programs.neovim = {
       extraPackages = attrValues { inherit (pkgs) pyright ruff; };
 
-      plugins =
-        [
-          (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: attrValues { inherit (plugins) ninja rst; }))
-        ]
-        ++ optional cfg.extras.dap.core.enable pkgs.vimPlugins.nvim-dap-python
-        ++ optional cfg.extras.test.core.enable pkgs.vimPlugins.neotest-python;
+      plugins = [
+        (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: attrValues { inherit (plugins) ninja rst; }))
+      ]
+      ++ optional cfg.extras.dap.core.enable pkgs.vimPlugins.nvim-dap-python
+      ++ optional cfg.extras.test.core.enable pkgs.vimPlugins.neotest-python;
       # TODO: ++ optional cfg.extras.editor.telescope.enable (
       #   pkgs.vimUtils.buildVimPlugin {
       #     pname = "venv-selector.nvim";

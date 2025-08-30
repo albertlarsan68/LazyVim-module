@@ -22,7 +22,8 @@ in
 
       plugins = [
         (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: [ plugins.zig ]))
-      ] ++ lib.optional cfg.extras.test.core.enable pkgs.vimPlugins.neotest-zig;
+      ]
+      ++ lib.optional cfg.extras.test.core.enable pkgs.vimPlugins.neotest-zig;
     };
   };
 }

@@ -59,12 +59,17 @@ in
     ./extras/formatting/prettier.nix
 
     ./extras/lang/astro.nix
+    ./extras/lang/clangd.nix
+    ./extras/lang/cmake.nix
+    ./extras/lang/git.nix
     ./extras/lang/go.nix
+    ./extras/lang/haskell.nix
     ./extras/lang/json.nix
     ./extras/lang/markdown.nix
     ./extras/lang/nix.nix
     ./extras/lang/prisma.nix
     ./extras/lang/python.nix
+    ./extras/lang/rust.nix
     ./extras/lang/svelte.nix
     ./extras/lang/tailwind.nix
     ./extras/lang/typescript.nix
@@ -166,6 +171,7 @@ in
                   }
                 }" },''
           }
+            { "L3MON4D3/LuaSnip", enabled = false },
         		{ "jay-babu/mason-nvim-dap.nvim", enabled = false },
         		{ "mason-org/mason-lspconfig.nvim", enabled = false },
         		{ "mason-org/mason.nvim", enabled = false },${
