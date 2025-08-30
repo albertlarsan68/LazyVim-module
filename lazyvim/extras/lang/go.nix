@@ -27,22 +27,21 @@ in
       #   inherit (pkgs) gomodifytags impl;
       # });
 
-      plugins =
-        [
-          (pkgs.vimPlugins.nvim-treesitter.withPlugins (
-            plugins:
-            attrValues {
-              inherit (plugins)
-                go
-                gomod
-                gosum
-                gowork
-                ;
-            }
-          ))
-        ]
-        ++ optional cfg.extras.dap.core.enable pkgs.vimPlugins.nvim-dap-go
-        ++ optional cfg.extras.test.core.enable pkgs.vimPlugins.neotest-golang;
+      plugins = [
+        (pkgs.vimPlugins.nvim-treesitter.withPlugins (
+          plugins:
+          attrValues {
+            inherit (plugins)
+              go
+              gomod
+              gosum
+              gowork
+              ;
+          }
+        ))
+      ]
+      ++ optional cfg.extras.dap.core.enable pkgs.vimPlugins.nvim-dap-go
+      ++ optional cfg.extras.test.core.enable pkgs.vimPlugins.neotest-golang;
     };
   };
 }
