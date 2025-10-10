@@ -32,6 +32,8 @@
 
       lib = import ./lib { inherit (nixpkgs) lib; };
 
+      overlays = import ./overlays self;
+
       packages = nixpkgs.lib.genAttrs (import systems) (
         system:
         let
