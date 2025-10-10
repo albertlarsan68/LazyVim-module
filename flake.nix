@@ -4,6 +4,11 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+    nvim-treesitter = {
+      flake = false;
+      url = "github:nvim-treesitter/nvim-treesitter/main";
+    };
+
     systems.url = "github:nix-systems/default-linux";
   };
 
