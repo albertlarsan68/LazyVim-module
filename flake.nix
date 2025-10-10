@@ -25,11 +25,27 @@
       packages = nixpkgs.lib.genAttrs (import systems) (
         system:
         let
-          inherit (import nixpkgs { inherit system; }) callPackage;
+          inherit (import nixpkgs { inherit system; })
+            callPackage
+            lib
+            neovim-unwrapped
+            wrapNeovimUnstable
+            ;
+
+          wrapNeovim = neovim-unwrapped: lib.makeOverridable (wrapNeovimUnstable neovim-unwrapped);
         in
         {
+          inherit wrapNeovim;
+
           astro-ts-plugin = callPackage ./pkgs/astro-ts-plugin { };
           markdown-toc = callPackage ./pkgs/markdown-toc { };
+          neovim = wrapNeovim neovim-unwrapped {
+            autowrapRuntimeDeps = false;
+            withPython3 = false;
+            waylandSupport = false;
+            withRuby = false;
+            wrapRc = false;
+          };
           typescript-svelte-plugin = callPackage ./pkgs/typescript-svelte-plugin { };
         }
       );
