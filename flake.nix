@@ -9,6 +9,11 @@
       url = "github:nvim-treesitter/nvim-treesitter/main";
     };
 
+    nvim-treesitter-textobjects = {
+      flake = false;
+      url = "github:nvim-treesitter/nvim-treesitter-textobjects/main";
+    };
+
     systems.url = "github:nix-systems/default-linux";
   };
 
