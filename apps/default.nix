@@ -5,4 +5,5 @@ builtins.mapAttrs
     program = value;
   })
   {
+    generate = import ./generate.nix self system;
   }
