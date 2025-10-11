@@ -28,6 +28,8 @@
       eachSystem = nixpkgs.lib.genAttrs (import systems);
     in
     {
+      apps = eachSystem (system: import ./apps self system);
+
       homeManagerModules = {
         default = self.homeManagerModules.lazyvim;
         lazyvim = import ./lazyvim self;
