@@ -8,6 +8,7 @@ self:
 let
   inherit (lib.modules) mkIf;
   inherit (lib.options) mkEnableOption mkOption;
+  inherit (lib.trivial) warnIf;
   inherit (lib.types)
     anything
     attrsOf
@@ -15,6 +16,7 @@ let
     str
     submodule
     ;
+  inherit (pkgs) symlinkJoin;
   inherit (self.lib.generators) toLazySpecs;
   inherit (self.lib.types) nested;
 
@@ -220,9 +222,50 @@ in
         		{ import = "plugins" },
         		{
         			"nvim-treesitter/nvim-treesitter",
-        			opts = function(_, opts)
-        				opts.ensure_installed = {}
-        			end,
+        			opts = {
+        				install_dir = "${
+              symlinkJoin {
+                pname = "tree-sitter-grammars";
+
+                inherit (pkgs.vimPlugins.nvim-treesitter) version;
+
+                paths = map ({ key, requires }: key) (
+                  let
+                    wrapGrammars =
+                      grammars:
+                      map (grammar: {
+                        key = "${grammar}";
+                        inherit (grammar) requires;
+                      }) grammars;
+                  in
+                  builtins.genericClosure {
+                    startSet = wrapGrammars (
+                      builtins.filter
+                        (
+                          grammar:
+                          let
+                            inherit (grammar) pname tier;
+
+                            unsupported = tier == 4;
+                          in
+                          warnIf unsupported ''
+                            `nvim-treesitter` has marked `${pname}` as unsupported.
+                            `${pname}` will not be included in the
+                            `tree-sitter-grammars` derivation used by `LazyVim-module`.
+                          '' (!unsupported)
+                        )
+                        (
+                          builtins.concatMap (
+                            plugin: plugin.grammars or [ ]
+                          ) config.programs.neovim.finalPackage.passthru.packpathDirs.myNeovimPackages.start
+                        )
+                    );
+                    operator = { key, requires }: wrapGrammars requires;
+                  }
+                );
+              }
+            }"
+        			},
         		},
         	},
         	defaults = {
