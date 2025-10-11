@@ -114,6 +114,8 @@ in
   };
 
   config = mkIf cfg.enable {
+    nixpkgs.overlays = [ self.overlays.nvim-treesitter-main ];
+
     programs.neovim = {
       enable = true;
 
