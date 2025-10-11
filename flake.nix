@@ -24,6 +24,9 @@
       systems,
       ...
     }:
+    let
+      eachSystem = nixpkgs.lib.genAttrs (import systems);
+    in
     {
       homeManagerModules = {
         default = self.homeManagerModules.lazyvim;
@@ -34,7 +37,7 @@
 
       overlays = import ./overlays self;
 
-      packages = nixpkgs.lib.genAttrs (import systems) (
+      packages = eachSystem (
         system:
         let
           inherit (import nixpkgs { inherit system; })
