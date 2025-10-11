@@ -6,6 +6,7 @@ self:
   ...
 }:
 let
+  inherit (lib.attrsets) mapAttrs' nameValuePair;
   inherit (lib.modules) mkIf;
   inherit (lib.options) mkEnableOption mkOption;
   inherit (lib.trivial) warnIf;
@@ -13,10 +14,11 @@ let
     anything
     attrsOf
     listOf
+    pathInStore
     str
     submodule
     ;
-  inherit (pkgs) symlinkJoin;
+  inherit (pkgs) linkFarm symlinkJoin;
   inherit (self.lib.generators) toLazySpecs;
   inherit (self.lib.types) nested;
 
@@ -113,6 +115,20 @@ in
     ai_cmp = mkEnableOption "installation of packages for vim.g.ai_cmp" // {
       default = true;
     };
+
+    masonPackages = mkOption {
+      default = { };
+      description = ''
+        Attribute set of store paths to link into {file}`$MASON/packages/`.
+      '';
+      example = ''
+        {
+          "js-debug-adapter/js-debug/src/dapDebugServer.js" =
+            "''${pkgs.vscode-js-debug}/lib/node_modules/js-debug/dist/src/dapDebugServer.js";
+        }
+      '';
+      type = attrsOf pathInStore;
+    };
   };
 
   config = mkIf cfg.enable {
@@ -123,50 +139,12 @@ in
 
       extraLuaConfig = ''
         ${
-          let
-            inherit (cfg.extras.lang)
-              astro
-              python
-              svelte
-              typescript
-              ;
+          lib.optionalString (cfg.masonPackages != { }) ''
+            vim.env.MASON = "${
+              linkFarm "mason" (mapAttrs' (name: path: nameValuePair "packages/${name}" path) cfg.masonPackages)
+            }"
 
-            selfPkgs = self.packages.${pkgs.stdenv.hostPlatform.system};
-
-            masonPackages = [
-              {
-                cond = astro.enable;
-                name = "packages/astro-language-server/node_modules/@astrojs/ts-plugin";
-                path = selfPkgs.astro-ts-plugin;
-              }
-              {
-                cond = svelte.enable;
-                name = "packages/svelte-language-server/node_modules/typescript-svelte-plugin";
-                path = selfPkgs.typescript-svelte-plugin;
-              }
-              {
-                cond = (astro.enable || svelte.enable || typescript.enable) && cfg.extras.dap.core.enable;
-                name = "packages/js-debug-adapter/js-debug/src/dapDebugServer.js";
-                path = "${pkgs.vscode-js-debug}/lib/node_modules/js-debug/dist/src/dapDebugServer.js";
-              }
-              {
-                cond = python.enable && cfg.extras.dap.core.enable;
-                name =
-                  if pkgs.stdenv.hostPlatform.isWindows then
-                    "packages/debugpy/venv/Scripts/pythonw.exe"
-                  else
-                    "packages/debugpy/venv/bin/python";
-                path = (pkgs.python3.withPackages (ps: [ ps.debugpy ])).interpreter;
-              }
-            ];
-
-            enabledMasonPackages = map (enabledMasonPackage: { inherit (enabledMasonPackage) name path; }) (
-              builtins.filter (masonPackage: masonPackage.cond) masonPackages
-            );
-          in
-          lib.optionalString (
-            enabledMasonPackages != [ ]
-          ) "vim.env.MASON = \"${pkgs.linkFarm "mason" enabledMasonPackages}\"\n\n"
+          ''
         }require("lazy").setup({
         	dev = { path = vim.api.nvim_list_runtime_paths()[1] .. "/pack/myNeovimPackages/start", patterns = { "" } },
         	spec = {
